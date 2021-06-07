@@ -8,23 +8,24 @@ import Breadcrumbs from "@material-ui/core/Breadcrumbs";
 import Link from "@material-ui/core/Link";
 import { makeStyles } from "@material-ui/core/styles";
 import { useTheme } from "@material-ui/core/styles";
+import axios from "axios";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import ThumbUpAltIcon from "@material-ui/icons/ThumbUpAlt";
 import ThumbDownAltIcon from "@material-ui/icons/ThumbDownAlt";
 const useStyles = makeStyles((theme) => ({
   videoDetail: {
-    display:"flex",
-    flexDirection:"column",
-    alignItems:"center",
-    marginBottom:"25px",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    marginBottom: "25px",
   },
-  videoContent:{
-    width:"90%"
+  videoContent: {
+    width: "90%",
   },
   videoPlayer: {
     width: "90vw",
-    alignSelf:"center",
-    marginTop:"10px",
+    alignSelf: "center",
+    marginTop: "10px",
     [theme.breakpoints.up("md")]: {
       width: "60vw",
       height: "65vh",
@@ -78,7 +79,9 @@ function DateConvertor(date, isSmallScreen) {
   month[11] = "December";
   let currDate = new Date();
   return `${
-    isSmallScreen ? month[Number(d[1])-1].substring(0, 3) : month[Number(d[1])-1]
+    isSmallScreen
+      ? month[Number(d[1]) - 1].substring(0, 3)
+      : month[Number(d[1]) - 1]
   } ${Number(d[2])}${currDate.getFullYear() > d[0] ? ` ,${d[0]}` : ""}`;
 }
 function convertToInternationalCurrencySystem(labelValue) {
@@ -112,21 +115,47 @@ export default function VideoDetail({ video }) {
   React.useEffect(() => {
     console.log(videoDetail);
   }, [videoDetail]);
+  let mounted = React.useRef(false);
+  let CancelToken = React.useRef(null);
+  React.useEffect(() => {
+    CancelToken.current = axios.CancelToken.source();
+    mounted.current = true;
+    return function cancel() {
+      mounted.current = false;
+      CancelToken.current.cancel(
+        "axios request for selected video cancelled as component will unmount"
+      );
+    };
+  }, []);
   React.useEffect(() => {
     (async (id) => {
-      let res = await youtubeVideoDetailAPI.get("/videos", {
-        params: {
-          part: "contentDetails,statistics",
-          id: `${id}`,
-        },
-      });
-      setVideoDetail(() => ({
-        statistics: res.data.items[0].statistics,
-        contentDetails: res.data.items[0].contentDetails,
-        snippet: res.data.items[0].snippet,
-      }));
+      try {
+        let res = await youtubeVideoDetailAPI.get("/videos", {
+          cancelToken: CancelToken.current.token,
+          params: {
+            part: "contentDetails,statistics",
+            id: `${id}`,
+          },
+        });
+        if (mounted.current) {
+          setVideoDetail(() => ({
+            statistics: res.data.items[0].statistics,
+            contentDetails: res.data.items[0].contentDetails,
+            snippet: res.data.items[0].snippet,
+          }));
+        }
+      } catch (error) {
+        if (axios.isCancel(error)) {
+          console.log(
+            " Axios Request canceled to find selected video",
+            error.message
+          );
+          // throw new Error("Cancelled");
+        }
+      }
     })(id.videoId);
   }, [id.videoId]);
+
   function handleTagClick(event) {
     event.preventDefault();
     console.info("You clicked a breadcrumb.");
@@ -175,9 +204,9 @@ export default function VideoDetail({ video }) {
         alt={id.kind.split("#")}
         src={`https://www.youtube.com/embed/${id.videoId}`}
         title={videoDetail.snippet.title}
-        frameborder="0"
+        frameBorder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen
+        allowFullScreen
         className={classes.videoPlayer}
       />
       <CardContent className={classes.videoContent}>
