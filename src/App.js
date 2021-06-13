@@ -25,6 +25,14 @@ const styles = (theme) => ({
     alignItems: "center",
   },
   searchBar: {
+    [theme.breakpoints.down("sm")]: {
+      maxWidth: "80vw",
+      marginBottom: "3vh",
+    },
+    [theme.breakpoints.between("sm", "lg")]: {
+      maxWidth: "60vw",
+      marginBottom: "3vh",
+    },
     [theme.breakpoints.up("lg")]: {
       maxWidth: "40vw",
       marginBottom: "3vh",

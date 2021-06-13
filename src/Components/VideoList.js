@@ -9,6 +9,7 @@ const styles = (theme) => ({
       display:"flex",
       flexDirection:"column",
       alignItems:"center",
+      justifyContent:"flex-start"
     },
   },
 });

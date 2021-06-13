@@ -5,10 +5,7 @@ import Box from "@material-ui/core/Box";
 import { makeStyles } from "@material-ui/core/styles";
 import { useTheme } from "@material-ui/core/styles";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
-function decodeHtml(html) {
-  var doc = new DOMParser().parseFromString(html, "text/html");
-  return doc.documentElement.textContent;
-}
+import {decodeHtml} from "../util";
 const useStyles = makeStyles((theme) => ({
   bigbox: {
     [theme.breakpoints.up("md")]: {

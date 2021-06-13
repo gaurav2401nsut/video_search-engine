@@ -12,6 +12,15 @@ import axios from "axios";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import ThumbUpAltIcon from "@material-ui/icons/ThumbUpAlt";
 import ThumbDownAltIcon from "@material-ui/icons/ThumbDownAlt";
+import {
+  convertToInternationalCurrencySystem,
+  numberWithCommas,
+  DateConvertor,
+} from "../util";
+import VideoComments from "./VideoComments";
+import ChannelDetail from "./ChannelDetail";
+import VideoDescription from "./VideoDescription";
+import { Divider } from "@material-ui/core";
 const useStyles = makeStyles((theme) => ({
   videoDetail: {
     display: "flex",
@@ -20,10 +29,10 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: "25px",
   },
   videoContent: {
-    width: "90%",
+    width: "95%",
   },
   videoPlayer: {
-    width: "90vw",
+    width: "95vw",
     alignSelf: "center",
     marginTop: "10px",
     [theme.breakpoints.up("md")]: {
@@ -57,46 +66,7 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
   },
 }));
-function numberWithCommas(x) {
-  if (!x) return 0;
-  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
-function DateConvertor(date, isSmallScreen) {
-  let d = date.substring(0, 10).split("-");
-  console.log(d);
-  var month = [];
-  month[0] = "January";
-  month[1] = "February";
-  month[2] = "March";
-  month[3] = "April";
-  month[4] = "May";
-  month[5] = "June";
-  month[6] = "July";
-  month[7] = "August";
-  month[8] = "September";
-  month[9] = "October";
-  month[10] = "November";
-  month[11] = "December";
-  let currDate = new Date();
-  return `${
-    isSmallScreen
-      ? month[Number(d[1]) - 1].substring(0, 3)
-      : month[Number(d[1]) - 1]
-  } ${Number(d[2])}${currDate.getFullYear() > d[0] ? ` ,${d[0]}` : ""}`;
-}
-function convertToInternationalCurrencySystem(labelValue) {
-  if (!labelValue) return 0;
-  // Nine Zeroes for Billions
-  return Math.abs(Number(labelValue)) >= 1.0e9
-    ? (Math.abs(Number(labelValue)) / 1.0e9).toFixed(2) + "B"
-    : // Six Zeroes for Millions
-    Math.abs(Number(labelValue)) >= 1.0e6
-    ? (Math.abs(Number(labelValue)) / 1.0e6).toFixed(2) + "M"
-    : // Three Zeroes for Thousands
-    Math.abs(Number(labelValue)) >= 1.0e3
-    ? (Math.abs(Number(labelValue)) / 1.0e3).toFixed(2) + "K"
-    : Math.abs(Number(labelValue));
-}
+
 export default function VideoDetail({ video }) {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.up("sm"));
@@ -273,6 +243,10 @@ export default function VideoDetail({ video }) {
             </Typography>
           </div>
         </div>
+        <ChannelDetail id={videoDetail.snippet.channelId} />
+        <VideoDescription text={videoDetail.snippet.description}/>
+        <Divider/>
+        <VideoComments id={id.videoId} />
       </CardContent>
     </Card>
   );
