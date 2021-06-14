@@ -57,16 +57,23 @@ function VideoComments(props) {
   const [comments, setComments] = React.useState({});
   let theme = useTheme();
   let isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
-  let commentsArray =
-    comments.items &&
-    comments.items.map((comment) => (
-      <VideoComment comment={comment} key={comment.id} />
-    ));
+  let commentsArray = [];
+
+  comments.items &&
+    comments.items.forEach((comment, index) =>
+      commentsArray.push(
+        <VideoComment
+          comment={comment}
+          key={comment.id}
+          loading={index < 5 ? "eager" : "lazy"}
+        />
+      )
+    );
   const [showMore, setShowMore] = React.useState(false);
   React.useEffect(() => {
     (async (id) => {
       let response = await youtubeAPI.get("/commentThreads", {
-        params: { part: "snippet", videoId: id, maxResults: "50" },
+        params: { part: "snippet", videoId: id, maxResults: "20" },
       });
       console.log(response);
       setComments(() => response.data);
