@@ -4,10 +4,10 @@ import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { numberWithCommas } from "../util";
 import SortIcon from "@material-ui/icons/Sort";
-import VideoComment from "./VideoComment";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { useTheme } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
+const VideoComment = React.lazy(() => import("./VideoComment"));
 const useStyles = makeStyles((theme) => ({
   commentList: {
     marginTop: "10px",
@@ -62,11 +62,15 @@ function VideoComments(props) {
   comments.items &&
     comments.items.forEach((comment, index) =>
       commentsArray.push(
-        <VideoComment
-          comment={comment}
-          key={comment.id}
-          loading={index < 5 ? "eager" : "lazy"}
-        />
+        <React.Suspense
+          fallback={<div style={{ height: "80px", width: "90%" }}></div>}
+        >
+          <VideoComment
+            comment={comment}
+            key={comment.id}
+            loading={index < 5 ? "eager" : "lazy"}
+          />
+        </React.Suspense>
       )
     );
   const [showMore, setShowMore] = React.useState(false);
