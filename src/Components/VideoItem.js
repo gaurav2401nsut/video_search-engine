@@ -5,7 +5,7 @@ import Box from "@material-ui/core/Box";
 import { makeStyles } from "@material-ui/core/styles";
 import { useTheme } from "@material-ui/core/styles";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
-import {decodeHtml} from "../util";
+import { decodeHtml } from "../util";
 const useStyles = makeStyles((theme) => ({
   bigbox: {
     [theme.breakpoints.up("md")]: {
@@ -39,12 +39,13 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     color: "#212121",
-    maxHeight: "60px",
+    fontSize: "calc(10px + 0.4vh + 0.2vw)",
+    marginBottom:"3px"
   },
   channelTitle: {
     color: "#878787",
     fontSize: "smaller",
-    marginTop: "5px",
+    marginTop: "3px",
   },
 }));
 
@@ -52,7 +53,7 @@ export default function VideoItem(props) {
   const theme = useTheme();
   const isBigScreen = useMediaQuery(theme.breakpoints.up("md"));
   const [isImageLoad, setImageLoad] = React.useState(false);
-  const { videoItem, selectedVideoHandler,selectedVideo } = props;
+  const { videoItem, selectedVideoHandler, selectedVideo } = props;
   const classes = useStyles();
   let boxVideoItem = {};
   if (videoItem)
@@ -62,14 +63,21 @@ export default function VideoItem(props) {
         selectedVideoHandler(videoItem);
       },
     };
+  let videoTitle = "";
+  if (videoItem) videoTitle = decodeHtml(videoItem.snippet.title);
   return (
     <Grid item>
-      <Box className={`${classes.box} ${selectedVideo?classes.bigbox:""}`} {...boxVideoItem}>
+      <Box
+        className={`${classes.box} ${selectedVideo ? classes.bigbox : ""}`}
+        {...boxVideoItem}
+      >
         {videoItem && (
           <>
             <img
               style={isImageLoad ? { display: "initial" } : { display: "none" }}
-              className={`${classes.image} ${selectedVideo?classes.imagelg:""}`}
+              className={`${classes.image} ${
+                selectedVideo ? classes.imagelg : ""
+              }`}
               alt={videoItem.snippet.title}
               src={
                 isBigScreen && selectedVideo
@@ -79,10 +87,14 @@ export default function VideoItem(props) {
               onLoad={() => setImageLoad(() => true)}
             />
             <div className={classes.videoContent}>
-              <p className={classes.title}>{decodeHtml(videoItem.snippet.title)}</p>
+              <p className={classes.title}>
+                {videoTitle.length > 60
+                  ? videoTitle.substring(0, 60) + "...."
+                  : videoTitle}
+              </p>
               <p className={classes.channelTitle}>
                 {videoItem.snippet.channelTitle.length > 30
-                  ? videoItem.snippet.channelTitle.substring(0, 30)
+                  ? videoItem.snippet.channelTitle.substring(0, 30) + "..."
                   : videoItem.snippet.channelTitle}
               </p>
             </div>
