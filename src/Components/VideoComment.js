@@ -105,7 +105,7 @@ function VideoComment({ comment, loading }) {
           </Typography>
         </div>
         <Linkify>
-          <Typography>
+          <Typography  style={{whiteSpace:"pre-wrap",overflowWrap:"break-word",wordBreak:"break-all",maxWidth:"100%"}}>
             {decodeHtml(
               readMore
                 ? comment.snippet.topLevelComment.snippet.textDisplay
