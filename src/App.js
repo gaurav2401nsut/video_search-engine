@@ -63,17 +63,19 @@ class App extends React.Component {
             regionCode: "US",
           },
         });
-        let videos = response.data.items;
-        videos = videos.filter((video) => video.hasOwnProperty("snippet"));
-        response.data.items = videos;
-        if (this.mounted) this.setState({ videoItems: response.data });
+        if (response !== undefined) {
+          let videos = response.data.items;
+          videos = videos.filter((video) => video.hasOwnProperty("snippet"));
+          response.data.items = videos;
+          if (this.mounted) this.setState({ videoItems: response.data });
+        }
       } catch (error) {
         if (axios.isCancel(error)) {
           console.log(
             " Axios Request canceled to find video related to user preference",
             error.message
           );
-          // throw new Error("Cancelled");
+          return;
         }
       }
     })();
@@ -97,14 +99,15 @@ class App extends React.Component {
         },
       });
       console.log(response);
-      if (this.mounted) this.setState({ videoItems: response.data });
+      if (this.mounted && response !== undefined)
+        this.setState({ videoItems: response.data });
     } catch (error) {
       if (axios.isCancel(error)) {
         console.log(
           " Axios Request canceled to search videos on some query",
           error.message
         );
-        // throw new Error("Cancelled");
+        return;
       }
     }
   };

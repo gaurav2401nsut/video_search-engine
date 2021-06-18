@@ -7,6 +7,7 @@ import SortIcon from "@material-ui/icons/Sort";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { useTheme } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
+import axios from "axios";
 const VideoComment = React.lazy(() => import("./VideoComment"));
 const useStyles = makeStyles((theme) => ({
   commentList: {
@@ -62,27 +63,51 @@ function VideoComments(props) {
   comments.items &&
     comments.items.forEach((comment, index) =>
       commentsArray.push(
-        <React.Suspense
-          fallback={<div style={{ height: "80px", width: "90%" }}></div>}
-        >
+        <React.Suspense fallback={<></>} key={comment.id}>
           <VideoComment
             comment={comment}
-            key={comment.id}
             loading={index < 5 ? "eager" : "lazy"}
           />
         </React.Suspense>
       )
     );
   const [showMore, setShowMore] = React.useState(false);
+  let mounted = React.useRef(false);
+  let CancelToken = React.useRef(null);
+  React.useEffect(() => {
+    mounted.current = true;
+    CancelToken.current = axios.CancelToken.source();
+    return function () {
+      mounted.current = false;
+      CancelToken.current.cancel(
+        "axios request for selected video cancelled as component will unmount"
+      );
+    };
+  }, []);
   React.useEffect(() => {
     (async (id) => {
-      let response = await youtubeAPI.get("/commentThreads", {
-        params: { part: "snippet", videoId: id, maxResults: "20" },
-      });
-      console.log(response);
-      setComments(() => response.data);
+      try {
+        let response = await youtubeAPI.get("/commentThreads", {
+          cancelToken: CancelToken.current.token,
+          params: { part: "snippet", videoId: id, maxResults: "20" },
+        });
+        if (mounted.current && response !== undefined) {
+          console.log(response);
+          setComments(() => response.data);
+        }
+      } catch (error) {
+        if (axios.isCancel(error)) {
+          console.log(
+            " Axios Request canceled to find selected video",
+            error.message
+          );
+          return;
+        }
+        console.log(error);
+      }
     })(id);
   }, [id]);
+
   return (
     <div className={classes.commentList}>
       <div className={classes.commentHeader}>

@@ -8,6 +8,7 @@ import { Button, ThemeProvider, Typography } from "@material-ui/core";
 import NotificationsNoneIcon from "@material-ui/icons/NotificationsNone";
 import NotificationsActiveIcon from "@material-ui/icons/NotificationsActive";
 import Snackbar from "@material-ui/core/Snackbar";
+import axios from "axios";
 const useStyles = makeStyles((theme) => ({
   dividerLine: {
     marginTop: "5px",
@@ -53,6 +54,18 @@ function ChannelDetail(props) {
   const [openSnackBar, setOpenSnackBar] = React.useState(false);
   const [snackPack, setSnackPack] = React.useState([]);
   const [messageInfo, setMessageInfo] = React.useState(undefined);
+  let mounted = React.useRef(false);
+  let CancelToken = React.useRef(null);
+  React.useEffect(() => {
+    mounted.current = true;
+    CancelToken.current = axios.CancelToken.source();
+    return function () {
+      mounted.current = false;
+      CancelToken.current.cancel(
+        "axios request for selected video cancelled as component will unmount"
+      );
+    };
+  }, []);
 
   React.useEffect(() => {
     if (snackPack.length && !messageInfo) {
@@ -100,20 +113,34 @@ function ChannelDetail(props) {
     });
   }
   React.useEffect(() => {
-    setSubscribed(() => false);
-    setNotified(() => false);
-    setNotified(() => false);
-    (async (id) => {
-      let response = await youtubeAPI.get("/channels", {
-        params: {
-          part: "snippet,statistics",
-          id: id,
-        },
-      });
-      setChannelDetail(() => {
-        return response.data.items[0];
-      });
-    })(id);
+    try {
+      setSubscribed(() => false);
+      setNotified(() => false);
+      setNotified(() => false);
+      (async (id) => {
+        let response = await youtubeAPI.get("/channels", {
+          cancelToken: CancelToken.current.token,
+          params: {
+            part: "snippet,statistics",
+            id: id,
+          },
+        });
+        if (mounted.current && response !== undefined) {
+          setChannelDetail(() => {
+            return response.data.items[0];
+          });
+        }
+      })(id);
+    } catch (error) {
+      if (axios.isCancel(error)) {
+        console.log(
+          " Axios Request canceled to find selected video",
+          error.message
+        );
+        return;
+      }
+      console.log(error);
+    }
   }, [id]);
   return (
     <>

@@ -93,7 +93,7 @@ export default function VideoDetail({ video }) {
     return function cancel() {
       mounted.current = false;
       CancelToken.current.cancel(
-        "axios request for selected video cancelled as component will unmount"
+        "axios request for selected video cancelled zas component will unmount"
       );
     };
   }, []);
@@ -107,7 +107,7 @@ export default function VideoDetail({ video }) {
             id: `${id}`,
           },
         });
-        if (mounted.current) {
+        if (mounted.current && res !== undefined) {
           setVideoDetail(() => ({
             statistics: res.data.items[0].statistics,
             contentDetails: res.data.items[0].contentDetails,
@@ -120,7 +120,7 @@ export default function VideoDetail({ video }) {
             " Axios Request canceled to find selected video",
             error.message
           );
-          // throw new Error("Cancelled");
+          return;
         }
       }
     })(id.videoId);
@@ -244,8 +244,8 @@ export default function VideoDetail({ video }) {
           </div>
         </div>
         <ChannelDetail id={videoDetail.snippet.channelId} />
-        <VideoDescription text={videoDetail.snippet.description}/>
-        <Divider/>
+        <VideoDescription text={videoDetail.snippet.description} />
+        <Divider />
         <VideoComments id={id.videoId} />
       </CardContent>
     </Card>
