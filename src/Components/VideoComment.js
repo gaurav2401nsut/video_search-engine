@@ -99,13 +99,27 @@ function VideoComment({ comment, loading }) {
             color="textSecondary"
             className={classes.commentDate}
           >
-            {timeSince(
-              Date.parse(comment.snippet.topLevelComment.snippet.publishedAt)
-            )}
+            {comment.snippet.topLevelComment.snippet.publishedAt ===
+            comment.snippet.topLevelComment.snippet.updatedAt
+              ? timeSince(
+                  Date.parse(
+                    comment.snippet.topLevelComment.snippet.publishedAt
+                  )
+                ) + " ago"
+              : timeSince(
+                  Date.parse(comment.snippet.topLevelComment.snippet.updatedAt)
+                ) + " ago (edited)"}
           </Typography>
         </div>
         <Linkify>
-          <Typography  style={{whiteSpace:"pre-wrap",overflowWrap:"break-word",wordBreak:"break-all",maxWidth:"100%"}}>
+          <Typography
+            style={{
+              whiteSpace: "pre-wrap",
+              overflowWrap: "break-word",
+              wordBreak: "break-all",
+              maxWidth: "100%",
+            }}
+          >
             {decodeHtml(
               readMore
                 ? comment.snippet.topLevelComment.snippet.textDisplay
