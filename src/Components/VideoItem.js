@@ -74,6 +74,7 @@ export default function VideoItem(props) {
         {videoItem && (
           <>
             <img
+              loading="lazy"
               style={isImageLoad ? { display: "initial" } : { display: "none" }}
               className={`${classes.image} ${
                 selectedVideo ? classes.imagelg : ""
