@@ -74,7 +74,7 @@ export default function VideoItem(props) {
         {videoItem && (
           <>
             <LazyLoadImage
-            effect="blur"
+              effect="blur"
               loading="lazy"
               className={`${classes.image} ${
                 selectedVideo ? classes.imagelg : ""
