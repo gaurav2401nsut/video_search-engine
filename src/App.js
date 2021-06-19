@@ -58,7 +58,7 @@ class App extends React.Component {
           params: {
             relatedToVideoId: "7ghhRHRP6t4",
             part: "snippet,id",
-            maxResults: "50",
+            maxResults: "100",
             order: "relevance",
             regionCode: "US",
           },
@@ -93,7 +93,7 @@ class App extends React.Component {
         params: {
           q: searchTextValue,
           part: "snippet,id",
-          maxResults: "50",
+          maxResults: "100",
           order: "relevance",
           regionCode: "US",
         },

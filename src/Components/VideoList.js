@@ -2,14 +2,15 @@ import React from "react";
 import VideoItem from "./VideoItem";
 import Grid from "@material-ui/core/Grid";
 import { withStyles } from "@material-ui/core/styles";
+import { trackWindowScroll } from "react-lazy-load-image-component";
 const styles = (theme) => ({
   videoList: {
     [theme.breakpoints.up("md")]: {
       flexBasis: "360px",
-      display:"flex",
-      flexDirection:"column",
-      alignItems:"center",
-      justifyContent:"flex-start"
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "flex-start",
     },
   },
 });
@@ -28,6 +29,7 @@ class VideoList extends React.Component {
       videoItems.push(
         <VideoItem
           videoItem={items[i]}
+          scrollPosition={this.props.scrollPosition}
           key={
             items[i]
               ? items[i].id.videoId
@@ -36,13 +38,13 @@ class VideoList extends React.Component {
               : i + "789"
           }
           selectedVideoHandler={this.props.selectedVideoHandler}
-          selectedVideo = {this.props.selectedVideo}
+          selectedVideo={this.props.selectedVideo}
         />
       );
     }
     return (
       <Grid
-        className={this.props.selectedVideo?classes.videoList:""}
+        className={this.props.selectedVideo ? classes.videoList : ""}
         container
         spacing={2}
         justify="space-evenly"
@@ -52,4 +54,4 @@ class VideoList extends React.Component {
     );
   }
 }
-export default withStyles(styles)(VideoList);
+export default withStyles(styles)(trackWindowScroll(VideoList));

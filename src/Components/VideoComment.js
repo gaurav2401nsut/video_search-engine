@@ -7,6 +7,7 @@ import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core/styles";
 import { ThumbDownAlt, ThumbUpAlt } from "@material-ui/icons";
+import { LazyLoadComponent } from "react-lazy-load-image-component";
 const useStyles = makeStyles((theme) => ({
   commentHeader: {
     display: "flex",
@@ -58,7 +59,7 @@ const useStyles = makeStyles((theme) => ({
     cursor: "pointer",
   },
 }));
-function VideoComment({ comment, loading }) {
+function VideoComment({ comment }) {
   let classes = useStyles();
   const [readMore, setReadMore] = React.useState(false);
   const [likeCount, setLikeCount] = React.useState(
@@ -84,11 +85,12 @@ function VideoComment({ comment, loading }) {
   }, [voteValue, comment]);
   return (
     <div className={classes.commentBox}>
-      <Avatar
-        loading={loading}
-        alt={comment.snippet.topLevelComment.snippet.authorDisplayName}
-        src={comment.snippet.topLevelComment.snippet.authorProfileImageUrl}
-      ></Avatar>
+      <LazyLoadComponent>
+        <Avatar
+          alt={comment.snippet.topLevelComment.snippet.authorDisplayName}
+          src={comment.snippet.topLevelComment.snippet.authorProfileImageUrl}
+        ></Avatar>
+      </LazyLoadComponent>
       <div className={classes.commentContent}>
         <div className={classes.authorDetails}>
           <Typography variant="body2" className={classes.authorName}>

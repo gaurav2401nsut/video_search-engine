@@ -61,12 +61,11 @@ function VideoComments(props) {
   let commentsArray = [];
 
   comments.items &&
-    comments.items.forEach((comment, index) =>
+    comments.items.forEach((comment) =>
       commentsArray.push(
         <React.Suspense fallback={<></>} key={comment.id}>
           <VideoComment
             comment={comment}
-            loading={index < 5 ? "eager" : "lazy"}
           />
         </React.Suspense>
       )
@@ -121,7 +120,7 @@ function VideoComments(props) {
               : "0"
           } Comments`}
         </Typography>
-        <span className={classes.sortButton}>
+        <span className={classes.sortButton} >
           <SortIcon />
           <Typography variant="body1" color="textSecondary">
             SORT BY

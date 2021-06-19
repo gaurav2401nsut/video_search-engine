@@ -6,6 +6,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { useTheme } from "@material-ui/core/styles";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { decodeHtml } from "../util";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 const useStyles = makeStyles((theme) => ({
   bigbox: {
     [theme.breakpoints.up("md")]: {
@@ -40,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
   title: {
     color: "#212121",
     fontSize: "calc(10px + 0.4vh + 0.2vw)",
-    marginBottom:"3px"
+    marginBottom: "3px",
   },
   channelTitle: {
     color: "#878787",
@@ -52,7 +53,6 @@ const useStyles = makeStyles((theme) => ({
 export default function VideoItem(props) {
   const theme = useTheme();
   const isBigScreen = useMediaQuery(theme.breakpoints.up("md"));
-  const [isImageLoad, setImageLoad] = React.useState(false);
   const { videoItem, selectedVideoHandler, selectedVideo } = props;
   const classes = useStyles();
   let boxVideoItem = {};
@@ -73,9 +73,9 @@ export default function VideoItem(props) {
       >
         {videoItem && (
           <>
-            <img
+            <LazyLoadImage
+            effect="blur"
               loading="lazy"
-              style={isImageLoad ? { display: "initial" } : { display: "none" }}
               className={`${classes.image} ${
                 selectedVideo ? classes.imagelg : ""
               }`}
@@ -85,7 +85,10 @@ export default function VideoItem(props) {
                   ? videoItem.snippet.thumbnails.default.url
                   : videoItem.snippet.thumbnails.medium.url
               }
-              onLoad={() => setImageLoad(() => true)}
+              placeholder={
+                <Skeleton variant="rect" className={classes.image} />
+              }
+              scrollPosition={props.scrollPosition}
             />
             <div className={classes.videoContent}>
               <p className={classes.title}>
@@ -101,7 +104,7 @@ export default function VideoItem(props) {
             </div>
           </>
         )}
-        {!isImageLoad && <Skeleton variant="rect" className={classes.image} />}
+        {!videoItem && <Skeleton variant="rect" className={classes.image} />}
         {!videoItem && (
           <Skeleton variant="text" className={classes.skeletonTitle} />
         )}
