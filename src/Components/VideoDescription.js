@@ -12,7 +12,14 @@ function VideoDescription({ text }) {
   let readLimit = 150;
   return (
     <Linkify>
-      <Typography style={{ whiteSpace: "pre-wrap", marginLeft: "45px" }}>
+      <Typography
+        style={{
+          whiteSpace: "pre-wrap",
+          marginLeft: "45px",
+          wordBreak: "break-all",
+          overflowWrap: "break-word",
+        }}
+      >
         {isReadMore ? text : text.slice(0, readLimit)}
       </Typography>
       {text.length > readLimit && (
