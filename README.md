@@ -1,72 +1,101 @@
-## Check it out at 
-# https://videosearchengine-by-akshaydohroo.netlify.app/
-# Getting Started with Create React App
+# **Docker** 
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+## Experience
+   ### Installation
+   I followed  the docker official documenation
 
-In the project directory, you can run:
+   [Docker Documentaion](https://docs.docker.com/get-started/overview/)
 
-### `npm start`
+   *Dockerfile*
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
 
-### `npm test`
+    FROM node:18 AS build
+    WORKDIR /app
+    COPY package* yarn.lock ./
+    RUN yarn install
+    COPY public ./public
+    COPY src ./src
+    RUN yarn build
+    FROM nginx:alpine
+    COPY ./.nginx/nginx.conf /etc/nginx/nginx.conf
+    RUN rm -rf /usr/share/nginx/html/*
+    COPY --from=build /app/build /usr/share/nginx/html
+    EXPOSE 3000 3000
+    ENTRYPOINT ["nginx", "-g", "daemon off;"]
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+   ### Using Docker
+   
+   - After a thorough study of materials available on docker including documentation, I was able to get a brief understanding of docker and as well as the importance of its applications.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+  - I found the docker documentations well written and beginner friendly.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+  - Following the getting started steps of docker ,i was able to get a clear sense of how to dockerize my react app .
 
-### `npm run eject`
+ - By following the example given in the getting started section ,I developed a basic docker file for my app .
+   - In my docker file ,i used base image of alpine and WORKDIR command was used to set the working directory for all the subsequent docker file instructions using *copy* command.
+    - I copied my root app directory available at source path to destination path .
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- To avoid docker form copying node modules and build folders ,a *dockerignore* file was used 
+node package manager(npm) install was run to install the dependencies modules inside docker container .
+- Build script defined in package.json was executed by using the command 
+npm run build and the build files were collected in build folder.
+- Node environment variable was changed to production to indicate production build .
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+- 3000 port of container was exposed by the docker expose command so that we will be able to map our host port to container exposed port .
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+- To statically serve the build folder npx serve command was used which was specified as an instruction to be executed when the docker container start by using the docker command cmd .
+- Resulting docker file was used to build a docker image with a tag name by executing docker build command 
+```docker
+docker build -t video-search-Engine 
+docker run -dp 3000:3000 video-search-Engine
+```
+- on my integrated terminal ,the build docker image was further analysed in the gui  provided by docker desktop where **i found that the image utilized significant storage space moreover time taken to build the docker image was quite high.**
 
-## Learn More
+## optimisation
+- Docker uses a layered architecture where current layer is built on previous layer
+ docker intrinsically perform caching where the output of a layer is cached and is used if the layers leading upto that layer are not changed .
+- To take advantage of caching behaviour *package.json* was copied first so that node modules didn't have to reinstalled on changes in our app's source code .
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- Even public and src folders were copied in different instructions, to take advantage of caching ,like before app was buiild for production however since we are not using server side rendering ,we don't need a node environment so **i decided to use multi stage build to reduce the image size ,the build folder from the previous stage was copied to my next stage which used nginx as a base image** ,the nginx server provided in the next stage was used to statically served the production code .
+- Using multistage build and properly utilising layer caching both the image build time and image size were brought down significantly 
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+ # Troubleshootings
+ To optimize the installations of node modules we used yarn but the following error was observed 
 
-### Code Splitting
+1.
+ >"yarn.ps1 cannot be loaded because running scripts is disabled on this system"
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+ To resolve this error the folllowing command was executed on my windows powershell 
+ ```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
+```
 
-### Analyzing the Bundle Size
+2.
+ >Error message "error:0308010C:digital envelope routines::unsupported"
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+During yarn build the above error was observed and to resolve  this error i had to change my package.json In your package.json: 
 
-### Making a Progressive Web App
+```json
+"start": "react-scripts start"
+```
+```json
+"start": "react-scripts --openssl-legacy-provider start"
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
 
-### Advanced Configuration
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## Applications of Docker
 
-### Deployment
+- Portable deployment of applications
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- Support for automatic building of docker images
+- Built-in version tracking
+- Registry for sharing images
+- A growing tools ecosystem from the docker API
+Consistency among different environments
+Efficient utilisation of resources
