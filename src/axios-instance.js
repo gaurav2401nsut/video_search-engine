@@ -4,8 +4,8 @@ const instance = axios.create({
   baseURL: "https://youtube-v31.p.rapidapi.com",
   timeout: 5000,
   headers: {
-    "x-rapidapi-key": process.env.REACT_APP_KEY,
-    "x-rapidapi-host": process.env.REACT_APP_HOST,
+    "x-rapidapi-key": "3094208016msh51208a22763fb8cp162ec9jsn4c0404080fc8",
+    "x-rapidapi-host": "youtube-v31.p.rapidapi.com",
   },
 });
 instance.interceptors.response.use(
